@@ -1,0 +1,32 @@
+/* Apply styles to the header container */
+header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 30px;                /* spacing between links */
+  padding: 15px 0;
+  background-color: #ffffff;
+  border-bottom: 1px solid #e0e0e0;
+  font-family: Arial, sans-serif;
+}
+
+/* Base style for NavLinks */
+header a {
+  text-decoration: none;
+  color: #333;
+  font-size: 16px;
+  font-weight: 500;
+  transition: color 0.3s ease, border-bottom 0.3s ease;
+  padding-bottom: 4px;
+}
+
+/* Hover effect */
+header a:hover {
+  color: #007bff;
+}
+
+/* Active link (NavLink gives `.active` automatically) */
+header a.active {
+  color: #007bff;
+  border-bottom: 2px solid #007bff;
+}

@@ -1,0 +1,23 @@
+/* Layout wrapper */
+.layout-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; /* full height */
+  background: #f9f9f9; /* light background */
+  font-family: Arial, sans-serif;
+}
+
+/* Header stays on top */
+.layout-header {
+  position: sticky; /* stays at top while scrolling */
+  top: 0;
+  z-index: 1000;
+  background: #fff;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+/* Main outlet content */
+.layout-content {
+  flex: 1; /* take remaining height */
+  padding: 20px 40px; /* space around content */
+}
