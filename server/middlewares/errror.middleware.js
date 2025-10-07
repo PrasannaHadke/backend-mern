@@ -1,28 +1,33 @@
 // middlewares/error.middleware.js
-const { ZodError } = require("zod");
-
 const errorMiddleware = (err, req, res, next) => {
-  console.error("🔥 Error caught in middleware:", err);
+  const status = err.status || 500;
+  const message = err.message || "Server Error";
 
-  // If error is from Zod validation
-  if (err instanceof ZodError) {
-    return res.status(400).json({
-      success: false,
-      message: "Validation failed",
-      errors: err.errors.map((e) => ({
-        path: e.path[0], // field name
-        message: e.message,
-      })),
-    });
+  let messages = [];
+
+  try {
+    if (err.extraDetails) {
+      // If extraDetails is an array, join to string
+      const jsonString = Array.isArray(err.extraDetails)
+        ? err.extraDetails.join("")
+        : err.extraDetails;
+
+      const parsed = JSON.parse(jsonString);
+
+      // Extract only message fields
+      messages = parsed.map((item) => item.message);
+    }
+  } catch (parseError) {
+    console.error("Error parsing extraDetails:", parseError);
+    messages = [err.extraDetails || "Invalid input"];
   }
 
-  // Generic error handler
-  const status = err.status || 500;
-  const message = err.message || "Something went wrong!";
+  console.error(`[${req.method}] ${req.path} >> Status: ${status}, Message: ${message}`);
 
   return res.status(status).json({
     success: false,
     message,
+    errors: messages, // frontend gets only messages array
   });
 };
 

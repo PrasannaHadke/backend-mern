@@ -1,8 +1,9 @@
 import React from 'react'
 import "../Header/Header.css"
 import { NavLink } from 'react-router-dom'
-
+import { useAuth } from '../../ContextApi/auth'
 function Header() {
+  const { isLoggedIn } = useAuth()
   return (
     <header>
       <NavLink to="/" end>
@@ -17,12 +18,18 @@ function Header() {
       <NavLink to="/services">
         Services
       </NavLink>
-      <NavLink to="/login">
-        Login
-      </NavLink>
-      <NavLink to="/signup">
-        SignUp
-      </NavLink>
+      {isLoggedIn ? <NavLink to="/logout">
+        Logout
+      </NavLink> :
+        <>
+          <NavLink to="/login">
+            Login
+          </NavLink>
+          <NavLink to="/signup">
+            SignUp
+          </NavLink>
+        </>
+      }
     </header>
   )
 }

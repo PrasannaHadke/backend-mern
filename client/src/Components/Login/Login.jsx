@@ -1,47 +1,60 @@
-import React, { useState } from 'react'
-import "./Login.css"
-import axios from 'axios'
-import {useNavigate} from 'react-router-dom'
+import React, { useState } from "react";
+import "./Login.css";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../ContextApi/auth";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function Login() {
-  const navigate = useNavigate()
-  const [userSignIn , setUserSignIn] = useState({
-    email : "",
-    password : ""
-  })
+  const navigate = useNavigate();
+  const { storeTokenInLs } = useAuth();
+  const [userSignIn, setUserSignIn] = useState({
+    email: "",
+    password: "",
+  });
 
-  const handleInput = (e)=>{
-    let {name , value} = e.target
+  const handleInput = (e) => {
+    const { name, value } = e.target;
     setUserSignIn({
       ...userSignIn,
-      [name] : value
-    })
-  }
+      [name]: value,
+    });
+  };
 
-  const handleSubmit = async(e)=>{
-    e.preventDefault()
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
     try {
-      const response = await axios.post("http://localhost:8000/api/auth/login",userSignIn,{
-        headers : {"Content-Type" : "application/json"}
-      })
-      if (response.ok) {
-        let res_data = response.data.token
-      // store token in local storage
-      // storeTokenInLs(response.data.token)
-      localStorage.setItem("token",res_data)
-        setUserSignIn({email : "" , password: ""})
-        navigate('/')
+      const response = await axios.post(
+        "http://localhost:8000/api/auth/login",
+        userSignIn,
+        {
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+
+      if (response.status === 200) {
+        const token = response.data.token;
+        storeTokenInLs(token);
+        setUserSignIn({ email: "", password: "" });
+        toast.success("Login successful!");
+        navigate("/");
       }
-      console.log("Login response",response.data);
     } catch (error) {
       if (error.response) {
-        alert(error.response.data.msg || "Error sign in user")
-      }else{
-        alert("Server error, try again later")
+        const message =
+          error.response.data?.message ||
+          error.response.data.errors[0]?.join(", ") ||
+          "Error signing in user";
+          console.log(message);
+        toast.error(message);
+      } else {
+        toast.error("Server error, try again later");
       }
+      console.error("Login error:", error.response.data.errors[0]);
     }
-  }
+  };
 
   return (
     <div className="login-container">
@@ -49,32 +62,45 @@ function Login() {
       <form onSubmit={handleSubmit}>
         <div>
           <label htmlFor="email">Email</label>
-          <input 
+          <input
             type="email"
             name="email"
             id="email"
-            placeholder='Enter Your Email'
+            placeholder="Enter Your Email"
             onChange={handleInput}
-            value={userSignIn.email} 
+            value={userSignIn.email}
             required
           />
         </div>
+
         <div>
           <label htmlFor="password">Password</label>
-          <input 
+          <input
             type="password"
             name="password"
             id="password"
-            placeholder='Enter Your password'
+            placeholder="Enter Your Password"
             onChange={handleInput}
-            value={userSignIn.password} 
+            value={userSignIn.password}
             required
           />
         </div>
-        <button type='submit'>Sign In</button>
+
+        <button type="submit">Sign In</button>
       </form>
+
+      {/* ToastContainer renders the toasts */}
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        closeOnClick
+        pauseOnHover
+        draggable
+        theme="colored"
+      />
     </div>
-  )
+  );
 }
 
-export default Login
+export default Login;
